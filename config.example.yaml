@@ -1,0 +1,26 @@
+# Configuration for the Newport CONEX-AGP API (one stage per container).
+# Mounted into the container at /app/config.yaml (override with CONFIG).
+# Read once at startup; restart the container to apply changes.
+#
+# To control several stages, run several instances of this container, each with
+# its own config file, device passthrough, and published port.
+
+# --- the stage -------------------------------------------------------------
+# 'device' should be a STABLE udev symlink (see udev/60-newport-stage.rules),
+# not a raw /dev/ttyUSBx, which renumbers across reboots/replugs. Use
+# 'emulator://' to run against the in-process simulator (no hardware).
+device: /dev/newport-focus
+address: 1              # one controller per USB port -> address 1
+label: focus           # human-readable label, returned by GET / and /health
+auto_home: false       # true = home on startup (CAUTION: physical motion)
+travel: [0.0, 27.0]    # software limits in stage units; queried if omitted
+units: mm              # display metadata only
+
+# --- emulator behaviour (ignored for real hardware) ------------------------
+speed: 5.0             # emulated units/second
+home_position: 13.5    # emulated HOME position
+home_time: 1.5         # emulated homing duration (s)
+
+# --- service tuning --------------------------------------------------------
+poll_interval: 0.25    # seconds between status polls while a ?wait is blocking
+default_timeout: 30.0  # max seconds a ?wait will block (and homing budget)

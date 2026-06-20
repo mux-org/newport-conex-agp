@@ -1,0 +1,28 @@
+# Stable device names for Newport CONEX-AGP controllers (USB VID:PID 104d:3006).
+#
+# Install:
+#   sudo cp udev/60-newport-stage.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload && sudo udevadm trigger
+#
+# MODE 0666 grants read/write so the (non-root) container user can open the port.
+#
+# Two naming strategies are provided -- pick ONE and map its symlink in config.yaml.
+
+# (A) BY PHYSICAL USB PORT (recommended for multi-stage rigs).
+#     Same physical port -> same name, regardless of plug order or reboot, and a
+#     replug into the same port tends to reuse the kernel node (helps reconnect
+#     under static --device passthrough). $env{ID_PATH} encodes the bus/port path,
+#     e.g. newport-stage-pci-0000:00:14.0-usb-0:2.1:1.0
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="104d", ATTRS{idProduct}=="3006", \
+    MODE:="0666", SYMLINK+="newport-stage-$env{ID_PATH}"
+
+# (B) BY SERIAL NUMBER (use if the controllers expose unique FTDI serials and you
+#     prefer naming by device rather than by port). Uncomment and run
+#     `udevadm info -a -n /dev/ttyUSBx | grep serial` to read the serials.
+# KERNEL=="ttyUSB*", ATTRS{idVendor}=="104d", ATTRS{idProduct}=="3006", \
+#     MODE:="0666", SYMLINK+="newport-stage-$attr{serial}"
+
+# (C) FIXED PER-DEVICE NAMES via serial (most explicit -- maps a known serial to a
+#     human name you reference directly in config.yaml as /dev/newport-focus):
+# KERNEL=="ttyUSB*", ATTRS{idVendor}=="104d", ATTRS{idProduct}=="3006", \
+#     ATTRS{serial}=="AB1234", MODE:="0666", SYMLINK+="newport-focus"
