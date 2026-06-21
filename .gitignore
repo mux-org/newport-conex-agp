@@ -13,4 +13,9 @@ dist/
 # Local, host-specific stage roster (copy from config.example.yaml)
 config.yaml
 
+# Sphinx documentation
+docs/_build/
+docs/_generated/
+docs/openapi.yaml
+
 .DS_Store
